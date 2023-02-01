@@ -19,7 +19,7 @@ resources:
 - name: {{ BASE_NAME }}
   type: compute.v1.network
   properties:
-    IPv4Range: 10.240.0.0/16
+    autoCreateSubnetworks: true
 
 - name: {{ BASE_NAME }}-allow-http
   type: compute.v1.firewall
@@ -32,6 +32,19 @@ resources:
         ports: ["80"]
     targetTags:
     - http-server
+
+- name: {{ BASE_NAME }}-allow-any
+  type: compute.v1.firewall
+  properties:
+    network: $(ref.{{ BASE_NAME }}.selfLink)
+    priority: 1000
+    direction: EGRESS
+    destinationRanges: ["0.0.0.0/0"]
+    allowed:
+      - IPProtocol: TCP
+        ports: ["80", "443"]
+    targetTags:
+    - tcp-egress
 
 {%- if properties['enableHttps'] %}
 - name: {{ BASE_NAME }}-allow-https
@@ -56,8 +69,6 @@ resources:
     allowed:
       - IPProtocol: TCP
         ports: ["22"]
-    targetTags:
-    - ssh-server
 
 outputs:
   - name: name

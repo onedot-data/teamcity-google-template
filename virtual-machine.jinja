@@ -223,6 +223,8 @@ resources:
                 ExecStart=/bin/mkdir -p /mnt/data/teamcity-server/data/config
                 ExecStart=/bin/mv /etc/teamcity/database.properties /mnt/data/teamcity-server/data/config/
                 ExecStart=/bin/mv /etc/teamcity/disabled-plugins.xml /mnt/data/teamcity-server/data/config/
+                ExecStart=/bin/bash -c 'sudo chown -R 1000:1000 /mnt/data/teamcity-server/'
+                ExecStart=/bin/bash -c 'sudo chown -R 1000:1000 /mnt/resource/teamcity-server/'
 
                 [Install]
                 WantedBy=multi-user.target
@@ -410,7 +412,7 @@ resources:
         boot: true
         initializeParams:
           diskName: {{ BASE_NAME }}-disk
-          sourceImage: {{ GlobalComputeUrl('teamcitytest-166414', 'images', 'flatcar-stable') }}
+          sourceImage: {{ GlobalComputeUrl(env['project_number'], 'images', 'flatcar-stable') }}
           diskSizeGb: 14
       - deviceName: {{ BASE_NAME }}-data
         type: PERSISTENT
